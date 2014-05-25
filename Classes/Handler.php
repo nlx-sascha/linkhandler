@@ -116,21 +116,18 @@ class Handler {
 	protected function getCurrentRecord($recordTableName, $recordUid) {
 
 		static $cache = array();
-		$parameterHash = $recordTableName . intval($recordUid);
+		$parameterHash = $recordTableName . intval($recordUid) . '-' . intval($GLOBALS['TSFE']->sys_page->sys_language_uid);
 
 		if (isset($cache[$parameterHash])) {
 			return $cache[$parameterHash];
 		}
 
-			// check for l18n_parent and fix the recordRow
-		$l18nPointer = (array_key_exists('transOrigPointerField', $GLOBALS['TCA'][$recordTableName]['ctrl']))
-							? $GLOBALS['TCA'][$recordTableName]['ctrl']['transOrigPointerField']
-							: '';
+		/** @var $sysPage \TYPO3\CMS\Frontend\Page\PageRepository */
+		$sysPage = $GLOBALS['TSFE']->sys_page;
+		$recordArray = $sysPage->getRawRecord($recordTableName, $recordUid);
 
-		$recordArray = $GLOBALS['TSFE']->sys_page->getRawRecord($recordTableName, $recordUid);
-
-		if (is_array($recordArray) && (array_key_exists($l18nPointer, $recordArray) && $recordArray[$l18nPointer] > 0 && $recordArray['sys_language_uid'] > 0)) {
-			$recordArray = $GLOBALS['TSFE']->sys_page->getRawRecord($recordTableName, $recordArray[$l18nPointer]);
+		if (is_array($recordArray) && $recordArray['sys_language_uid'] != $sysPage->sys_language_uid) {
+			$recordArray = $sysPage->getRecordOverlay($recordTableName, $recordArray, $sysPage->sys_language_uid);
 		}
 
 		$cache[$parameterHash] = $recordArray;
