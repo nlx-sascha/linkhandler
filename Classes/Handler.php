@@ -64,6 +64,10 @@ class Handler {
 			$this->localContentObject->start($recordArray, '');
 			$typoScriptConfiguration[$recordTableName . '.']['parameter'] .= $additionalLinkParameters;
 
+			if (trim($typoLinkConfiguration['parameter']) === $linkParameters) {
+				unset($typoLinkConfiguration['parameter']);
+			}
+
 			$currentLinkConfigurationArray = $this->mergeTypoScript($typoScriptConfiguration, $typoLinkConfiguration, $recordTableName);
 
 			// build the full link to the record
