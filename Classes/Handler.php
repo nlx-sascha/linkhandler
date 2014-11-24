@@ -189,6 +189,19 @@ class Handler {
 				unset($typoLinkConfigurationArray['parameter.']);
 			}
 			$linkConfigurationArray[$recordTableName . '.'] = array_merge($linkConfigurationArray[$recordTableName . '.'], $typoLinkConfigurationArray);
+
+			if (isset($linkConfigurationArray[$recordTableName . '.']['parameter'])) {
+				$link_paramA = \TYPO3\CMS\Core\Utility\GeneralUtility::unQuoteFilenames($linkConfigurationArray[$recordTableName . '.']['parameter'], TRUE);
+				$linkClass = trim($link_paramA[1]);
+
+				if ($linkClass) {
+					if (isset($linkConfigurationArray[$recordTableName . '.']['ATagParams'])) {
+						$linkConfigurationArray[$recordTableName . '.']['ATagParams'] .= ' class="' . $linkClass . '"';
+					} else {
+						$linkConfigurationArray[$recordTableName . '.']['ATagParams'] = 'class="' . $linkClass . '"';
+					}
+				}
+			}
 		}
 
 		return $linkConfigurationArray[$recordTableName . '.'];
